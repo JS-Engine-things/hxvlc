@@ -79,7 +79,7 @@ download_vlc()
 		git apply --whitespace=fix ../project/vlc/scripts/patches/iOS/*.patch
 
 		# Apply "VLCKit" patches.
-		git am --whitespace=fix ../VLCKit/libvlc/patches/*.patch
+		git apply --whitespace=fix ../VLCKit/libvlc/patches/*.patch
 
 		if [ $? -ne 0 ]; then
 			git am --abort
@@ -98,7 +98,7 @@ download_vlc()
 		git apply --whitespace=fix ../project/vlc/scripts/patches/iOS/*.patch
 
 		# Apply "VLCKit" patches.
-		git am --whitespace=fix ../VLCKit/libvlc/patches/*.patch
+		git apply --whitespace=fix ../VLCKit/libvlc/patches/*.patch
 
 		cd ..
 	fi
@@ -151,6 +151,7 @@ reorder_patches "VLCKit/libvlc/patches" \
 	"0008-libvlc-add-a-basic-API-to-change-freetype-s-color-bo.patch" \
 	"0010-add-auto-deinterlacer-mode-which-is-also-valid.patch" \
 	"0011-Users-will-be-able-to-change-the-deinterlace-mode-wi.patch" \
+	"0012-contrib-ffmpeg-enable-videotoolbox-encoder.patch" \
 	"0015-lib-save-configuration-after-playback-parse.patch" \
 	"0017-libvlc-media_player-Add-record-method.patch" \
 	"0018-libvlc-events-Add-callbacks-for-record.patch" \
