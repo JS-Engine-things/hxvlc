@@ -20,7 +20,7 @@
 		<vflag name="-rpath" value="@executable_path/lib/" if="macos" />
 
 		<section if="windows">
-			<section if="HXCPP_M64">
+			<section if="HXCPP_M32">
 				<lib name="${PROJECT_DIR}/lib/Windows/libvlc.lib" />
 				<lib name="${PROJECT_DIR}/lib/Windows/libvlccore.lib" />
 			</section>
