@@ -7,6 +7,7 @@ import flixel.graphics.FlxGraphic;
 import flixel.util.FlxColor;
 
 import hxvlc.util.Location;
+import hxvlc.funkin.FunkinInternalVideo;
 
 /**
  * This class extends `FlxSprite` to display video files in HaxeFlixel.
@@ -36,7 +37,9 @@ import hxvlc.util.Location;
 class FlxVideoSprite extends FlxSprite
 {
 	/** The video bitmap object. */
-	public var bitmap:Null<FlxInternalVideo>;
+	public var bitmap:Null<FunkinInternalVideo>;
+
+	public var autoPause(default, set):Bool = true;
 
 	/**
 	 * Creates a `FlxVideoSprite` at a specified position.
@@ -50,7 +53,7 @@ class FlxVideoSprite extends FlxSprite
 
 		makeGraphic(1, 1, FlxColor.TRANSPARENT);
 
-		bitmap = new FlxInternalVideo(antialiasing);
+		bitmap = new FunkinInternalVideo(antialiasing);
 		bitmap.forceRendering = true;
 		bitmap.onFormatSetup.add(function():Void
 		{
@@ -161,6 +164,12 @@ class FlxVideoSprite extends FlxSprite
 	private override function set_antialiasing(value:Bool):Bool
 	{
 		return antialiasing = (bitmap == null ? value : (bitmap.smoothing = value));
+	}
+
+	@:noCompletion
+	private function set_autoPause(value:Bool):Bool
+	{
+		return autoPause = (bitmap == null ? value : (bitmap.autoPause = value));
 	}
 }
 #end
