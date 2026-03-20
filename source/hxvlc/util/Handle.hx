@@ -7,7 +7,6 @@ import cpp.StdVector;
 import haxe.io.Path;
 
 import hxvlc.externs.LibVLC;
-import hxvlc.externs.Types;
 import hxvlc.util.MainLoop;
 import hxvlc.util.macros.DefineMacro;
 
@@ -20,7 +19,6 @@ import cpp.VarList;
 
 import haxe.Log;
 #end
-
 #if android
 import haxe.Exception;
 
@@ -130,38 +128,31 @@ class Handle
 
 			final args:StdVector<ConstCharStar> = new cpp.StdVector<ConstCharStar>();
 
-			args.push_back("--audio-resampler=soxr");   // High-quality audio resampler (default in VLC 4.0)
-			args.push_back("--ignore-config");          // Ignore any existing VLC config files
-			args.push_back("--drop-late-frames");       // Drop late video frames instead of trying to render them
+			args.push_back("--audio-resampler=soxr"); // High-quality audio resampler (default in VLC 4.0)
+			args.push_back("--ignore-config"); // Ignore any existing VLC config files
+			args.push_back("--drop-late-frames"); // Drop late video frames instead of trying to render them
 
-			args.push_back("--aout=none");              // Disable audio output (we use amem)
-			args.push_back("--intf=none");              // Disable interface / UI
-			args.push_back("--vout=none");              // Disable video output (we use vmem)
-
+			args.push_back("--aout=none"); // Disable audio output (we use amem)
+			args.push_back("--intf=none"); // Disable interface / UI
+			args.push_back("--vout=none"); // Disable video output (we use vmem)
 			args.push_back("--text-renderer=freetype"); // Use Freetype for subtitles/text overlays
 
-			#if ios
-			args.push_back("--no-color");               // Disable colored console output (cleaner Xcode log)
-			#end
-
-			#if !HXVLC_SHARE_DIRECTORY
-			args.push_back("--no-lua");                 // Disable Lua scripting engine if not using shared directory
-			#end
-
-			args.push_back("--no-interact");            // Disable interaction prompts
-			args.push_back("--no-keyboard-events");     // Disable keyboard input
-			args.push_back("--no-mouse-events");        // Disable mouse events
-			args.push_back("--no-snapshot-preview");    // Disable snapshot previews
-			args.push_back("--no-sout-keep");           // Disable streaming output persistence
+			args.push_back("--no-color"); // Disable colored console output
+			args.push_back("--no-lua"); // Disable Lua scripting engine
+			args.push_back("--no-interact"); // Disable interaction prompts
+			args.push_back("--no-keyboard-events"); // Disable keyboard input
+			args.push_back("--no-mouse-events"); // Disable mouse events
+			args.push_back("--no-snapshot-preview"); // Disable snapshot previews
+			args.push_back("--no-sout-keep"); // Disable streaming output persistence
 			args.push_back("--no-sub-autodetect-file"); // Don’t automatically load subtitle files
-			args.push_back("--no-video-title-show");    // Don’t show video title overlay at playback start
+			args.push_back("--no-video-title-show"); // Don’t show video title overlay at playback start
 
 			#if (macos || ios)
-			args.push_back("--no-videotoolbox");        // Disable VideoToolbox hardware decoding (to make subtitles work)
+			args.push_back("--no-videotoolbox"); // Disable VideoToolbox hardware decoding (to make subtitles work)
 			#end
 
-			args.push_back("--no-volume-save");         // Don’t save last volume level
-			args.push_back("--no-xlib");                // Disable X11 output (irrelevant on Apple)
+			args.push_back("--no-volume-save"); // Don’t save last volume level
+			args.push_back("--no-xlib"); // Disable X11 output (irrelevant on Apple)
 
 			#if (windows || macos)
 			final pluginPath:Null<String> = Sys.getEnv('VLC_PLUGIN_PATH');
@@ -250,41 +241,6 @@ class Handle
 		return LibVLC.get_changeset();
 	}
 
-	#if android
-	@:noCompletion
-	private static function setupEnvVariables():Void
-	{
-		final homePath:String = Path.join([Path.directory(System.applicationStorageDirectory), 'libvlc']);
-
-		#if HXVLC_SHARE_DIRECTORY
-		final libvlcLibrary:Future<AssetLibrary> = Assets.loadLibrary('libvlc');
-		libvlcLibrary.onComplete(function(library:AssetLibrary):Void
-		{
-			@:nullSafety(Off)
-			for (file in library.list(null))
-			{
-				final savePath:String = Path.join([homePath, '.share', file.substring(file.indexOf('/', 0) + 1, file.length)]);
-
-				Util.mkDirs(Path.directory(savePath));
-
-				try
-				{
-					if (!FileSystem.exists(savePath))
-						File.saveBytes(savePath, library.getBytes(file));
-				}
-				catch (e:Exception)
-					trace('Failed to save file "$savePath", ${e.message}.');
-			}
-		});
-		libvlcLibrary.onError(function(error:String):Void
-		{
-			trace('Failed to load library: libvlc, Error: $error');
-		});
-		#end
-
-		Sys.putEnv('HOME', homePath);
-	}
-	#else
 	@:noCompletion
 	private static function setupEnvVariables():Void
 	{
@@ -302,7 +258,6 @@ class Handle
 			Sys.putEnv('VLC_PLUGIN_PATH', pluginPath);
 		#end
 	}
-	#end
 
 	#if HXVLC_LOGGING
 	@:keep

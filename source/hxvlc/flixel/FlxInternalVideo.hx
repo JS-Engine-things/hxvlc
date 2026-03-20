@@ -6,11 +6,10 @@ import flixel.FlxG;
 import haxe.io.Bytes;
 import haxe.io.Path;
 
-import hxvlc.externs.Types;
+import hxvlc.externs.LibVLC;
 import hxvlc.openfl.Video;
 import hxvlc.util.Location;
 import hxvlc.util.Util;
-import hxvlc.util.macros.DefineMacro;
 
 import openfl.utils.Assets;
 
@@ -210,10 +209,7 @@ class FlxInternalVideo extends Video
 	@:noCompletion
 	private function onVolumeChange(vol:Float):Void
 	{
-		final currentVolume:Int = Math.floor((vol * DefineMacro.getFloat('HXVLC_FLIXEL_VOLUME_MULTIPLIER', 125)) * volumeAdjust);
-
-		if (volume != currentVolume)
-			volume = currentVolume;
+		volume = Math.abs(vol * volumeAdjust);
 	}
 
 	@:noCompletion

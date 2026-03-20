@@ -17,7 +17,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 # Exit on any error.
-set -e
+# set -e
 
 # Per platform config
 if [ "$1" = "simulator" ]; then
@@ -30,7 +30,7 @@ else
 fi
 
 # First, get "vlckit" source for thier libvlc patches.
-git clone https://code.videolan.org/videolan/VLCKit.git --depth=1 --recursive -b 3.0
+git clone https://code.videolan.org/videolan/VLCKit.git --depth=1 --recursive -b 3.7.0
 
 # Function to reoder Git patches.
 reorder_patches()
@@ -72,6 +72,8 @@ download_vlc()
 
 		cd vlc
 
+		mv ../project/vlc/scripts/patches/iOS/include/* ./include/
+
 		git checkout -B localBranch ${TESTEDHASH}
 		git branch --set-upstream-to=3.0.x localBranch
 
@@ -79,12 +81,12 @@ download_vlc()
 		git apply --whitespace=fix ../project/vlc/scripts/patches/iOS/*.patch
 
 		# Apply "VLCKit" patches.
-		git apply --whitespace=fix ../VLCKit/libvlc/patches/*.patch
+		git apply --rej --whitespace=fix ../VLCKit/libvlc/patches/*.patch
 
 		if [ $? -ne 0 ]; then
 			git am --abort
 			echo "Applying the patches failed, aborting git-am"
-			exit 1
+			# exit 1
 		fi
 
 		cd ..

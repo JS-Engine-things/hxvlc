@@ -21,7 +21,6 @@ import haxe.io.BytesData;
 import haxe.io.BytesInput;
 
 import hxvlc.externs.LibVLC;
-import hxvlc.externs.Types;
 import hxvlc.openfl.textures.VideoTexture;
 import hxvlc.util.Handle;
 import hxvlc.util.MainLoop;
@@ -307,17 +306,14 @@ class Video extends openfl.display.Bitmap
 	/** Playback rate of the video. */
 	public var rate(get, set):Single;
 
-	/** Frame rate of the video. */
-	public var fps(get, never):Float;
-
 	/** Indicates whether seeking is supported. */
 	public var isSeekable(get, never):Bool;
 
 	/** Indicates whether pausing is supported. */
 	public var canPause(get, never):Bool;
 
-	/** Volume level (0 to 100). */
-	public var volume(get, set):Int;
+	/** Volume level (0.0 to 1.0). */
+	public var volume(get, set):Float;
 
 	/** Role of the media. */
 	public var role(get, set):UInt;
@@ -1061,49 +1057,6 @@ class Video extends openfl.display.Bitmap
 	}
 
 	@:noCompletion
-	private function get_fps():Float
-	{
-		if (mediaPlayer != null)
-		{
-			final currentMediaItem:Pointer<LibVLC_Media_T> = Pointer.fromRaw(LibVLC.media_player_get_media(mediaPlayer.raw));
-
-			if (currentMediaItem != null)
-			{
-				final tracks:RawPointer<RawPointer<LibVLC_Media_Track_T>> = untyped nullptr;
-
-				final count:UInt32 = LibVLC.media_tracks_get(currentMediaItem.raw, Pointer.addressOf(tracks).raw);
-
-				for (i in 0...count)
-				{
-					final track:RawPointer<LibVLC_Media_Track_T> = tracks[i];
-
-					if (track[0].i_type != LibVLC_Track_Video || LibVLC.video_get_track(mediaPlayer.raw) != track[0].i_id)
-						continue;
-
-					if (track[0].video[0].i_frame_rate_num > 0 && track[0].video[0].i_frame_rate_den > 0)
-					{
-						final fps:Float = track[0].video[0].i_frame_rate_num / track[0].video[0].i_frame_rate_den;
-
-						LibVLC.media_tracks_release(tracks, count);
-
-						LibVLC.media_release(currentMediaItem.raw);
-
-						return fps;
-					}
-
-					break;
-				}
-
-				LibVLC.media_tracks_release(tracks, count);
-
-				LibVLC.media_release(currentMediaItem.raw);
-			}
-		}
-
-		return 0.0;
-	}
-
-	@:noCompletion
 	private function get_isSeekable():Bool
 	{
 		return mediaPlayer != null && LibVLC.media_player_is_seekable(mediaPlayer.raw) != 0;
@@ -1116,21 +1069,21 @@ class Video extends openfl.display.Bitmap
 	}
 
 	@:noCompletion
-	private function get_volume():Int
+	private function get_volume():Float
 	{
 		#if lime_openal
-		return alSource != null ? Math.floor(AL.getSourcef(alSource, AL.GAIN) * 100) : -1;
+		return alSource != null ? AL.getSourcef(alSource, AL.GAIN) : -1;
 		#else
 		return -1;
 		#end
 	}
 
 	@:noCompletion
-	private function set_volume(value:Int):Int
+	private function set_volume(value:Float):Float
 	{
 		#if lime_openal
 		if (alSource != null)
-			AL.sourcef(alSource, AL.GAIN, Math.abs(value / 100));
+			AL.sourcef(alSource, AL.GAIN, value);
 		#end
 
 		return value;
